@@ -1,5 +1,5 @@
 import * as HTTPUtil from "@src/util/request";
-import { StormGlass } from "@src/controllers/stormGlass";
+import { StormGlass } from "@src/clients/stormGlass";
 import stormGlassWeather3HoursFixture from "@test/fixtures/stormGlass_weather_3_hours.json";
 import stormGlassResponseNormalized3HoursFixture from "@test/fixtures/stormGlass_normalized_response_3_hours.json";
 
