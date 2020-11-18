@@ -1,26 +1,51 @@
-import config, { IConfig } from "config";
-import * as HTTPUtil from "@src/util/request";
 import { InternalError } from "@src/util/errors/internal-error";
+import config, { IConfig } from "config";
+// Another way to have similar behaviour to TS namespaces
+import * as HTTPUtil from "@src/util/request";
 
-export interface StormGlassForecastResponse {
-  readonly hours: StormGlassPoint[];
+export interface StormGlassPointSource {
+  [key: string]: number;
 }
 
 export interface StormGlassPoint {
+  time: string;
+  readonly waveHeight: StormGlassPointSource;
+  readonly waveDirection: StormGlassPointSource;
   readonly swellDirection: StormGlassPointSource;
   readonly swellHeight: StormGlassPointSource;
   readonly swellPeriod: StormGlassPointSource;
-  readonly time: string;
-  readonly waveDirection: StormGlassPointSource;
-  readonly waveHeight: StormGlassPointSource;
   readonly windDirection: StormGlassPointSource;
   readonly windSpeed: StormGlassPointSource;
 }
 
-export interface StormGlassPointSource {
-  readonly [key: string]: number;
+export interface StormGlassForecastResponse {
+  hours: StormGlassPoint[];
 }
 
+export interface ForecastPoint {
+  time: string;
+  waveHeight: number;
+  waveDirection: number;
+  swellDirection: number;
+  swellHeight: number;
+  swellPeriod: number;
+  windDirection: number;
+  windSpeed: number;
+}
+
+/**
+ * This error type is used when a request reaches out to the StormGlass API but returns an error
+ */
+export class StormGlassUnexpectedResponseError extends InternalError {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+/**
+ * This error type is used when something breaks before the request reaches out to the StormGlass API
+ * eg: Network error, or request validation error
+ */
 export class ClientRequestError extends InternalError {
   constructor(message: string) {
     const internalMessage =
@@ -37,7 +62,10 @@ export class StormGlassResponseError extends InternalError {
   }
 }
 
-const stormGlassResourceConfig: IConfig = config.get<config.IConfig>(
+/**
+ * We could have proper type for the configuration
+ */
+const stormglassResourceConfig: IConfig = config.get(
   "App.resources.StormGlass"
 );
 
@@ -51,28 +79,32 @@ export class StormGlass {
   public async fetchPoints(lat: number, lng: number): Promise<ForecastPoint[]> {
     try {
       const response = await this.request.get<StormGlassForecastResponse>(
-        `${stormGlassResourceConfig.get("apiUrl")}/weather/point?params=${
+        `${stormglassResourceConfig.get(
+          "apiUrl"
+        )}/weather/point?lat=${lat}&lng=${lng}&params=${
           this.stormGlassAPIParams
-        }&source=${this.stormGlassAPISource}&lat=${lat}lng=${lng}`,
+        }&source=${this.stormGlassAPISource}`,
         {
           headers: {
-            Authorization: stormGlassResourceConfig.get("apiToken"),
+            Authorization: stormglassResourceConfig.get("apiToken"),
           },
         }
       );
       return this.normalizeResponse(response.data);
-    } catch (error) {
-      if (HTTPUtil.Request.isRequestError(error)) {
+    } catch (err) {
+      /**
+       * This is handling the Axios errors specifically
+       */
+      if (HTTPUtil.Request.isRequestError(err)) {
         throw new StormGlassResponseError(
-          `Error: ${JSON.stringify(error.response.data)} Code: ${
-            error.response.status
+          `Error: ${JSON.stringify(err.response.data)} Code: ${
+            err.response.status
           }`
         );
       }
-      throw new ClientRequestError(error.message);
+      throw new ClientRequestError(err.message);
     }
   }
-
   private normalizeResponse(
     points: StormGlassForecastResponse
   ): ForecastPoint[] {
@@ -90,25 +122,14 @@ export class StormGlass {
 
   private isValidPoint(point: Partial<StormGlassPoint>): boolean {
     return !!(
+      point.time &&
       point.swellDirection?.[this.stormGlassAPISource] &&
       point.swellHeight?.[this.stormGlassAPISource] &&
       point.swellPeriod?.[this.stormGlassAPISource] &&
-      point.time &&
       point.waveDirection?.[this.stormGlassAPISource] &&
       point.waveHeight?.[this.stormGlassAPISource] &&
       point.windDirection?.[this.stormGlassAPISource] &&
       point.windSpeed?.[this.stormGlassAPISource]
     );
   }
-}
-
-export interface ForecastPoint {
-  swellDirection: number;
-  swellHeight: number;
-  swellPeriod: number;
-  time: string;
-  waveDirection: number;
-  waveHeight: number;
-  windDirection: number;
-  windSpeed: number;
 }

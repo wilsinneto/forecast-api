@@ -1,27 +1,13 @@
-import { ForecastPoint, StormGlass } from "@src/clients/stormGlass";
+import { StormGlass, ForecastPoint } from "@src/clients/stormGlass";
 import { InternalError } from "@src/util/errors/internal-error";
+import { Beach } from "@src/models/beach";
 
-export enum BeachPosition {
-  S = "S",
-  E = "E",
-  W = "W",
-  N = "N",
-}
-
-export interface Beach {
-  name: string;
-  position: BeachPosition;
-  lat: number;
-  lng: number;
-  user: string;
-}
+export interface BeachForecast extends Omit<Beach, "user">, ForecastPoint {}
 
 export interface TimeForecast {
   time: string;
   forecast: BeachForecast[];
 }
-
-export interface BeachForecast extends Omit<Beach, "user">, ForecastPoint {}
 
 export class ForecastProcessingInternalError extends InternalError {
   constructor(message: string) {
@@ -39,30 +25,14 @@ export class Forecast {
     try {
       for (const beach of beaches) {
         const points = await this.stormGlass.fetchPoints(beach.lat, beach.lng);
-        const enrichedBeachData = this.enrichedBeachData(points, beach);
+        const enrichedBeachData = this.enrichBeachData(points, beach);
         pointsWithCorrectSources.push(...enrichedBeachData);
       }
       return this.mapForecastByTime(pointsWithCorrectSources);
     } catch (error) {
+      // console.error(error);
       throw new ForecastProcessingInternalError(error.message);
     }
-  }
-
-  private enrichedBeachData(
-    points: ForecastPoint[],
-    beach: Beach
-  ): BeachForecast[] {
-    return points.map((e) => ({
-      ...{},
-      ...{
-        lat: beach.lat,
-        lng: beach.lng,
-        name: beach.name,
-        position: beach.position,
-        rating: 1,
-      },
-      ...e,
-    }));
   }
 
   private mapForecastByTime(forecast: BeachForecast[]): TimeForecast[] {
@@ -79,5 +49,22 @@ export class Forecast {
       }
     }
     return forecastByTime;
+  }
+
+  private enrichBeachData(
+    points: ForecastPoint[],
+    beach: Beach
+  ): BeachForecast[] {
+    return points.map((e) => ({
+      ...{},
+      ...{
+        lat: beach.lat,
+        lng: beach.lng,
+        name: beach.name,
+        position: beach.position,
+        rating: 1,
+      },
+      ...e,
+    }));
   }
 }

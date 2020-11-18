@@ -1,7 +1,6 @@
 import { StormGlass } from "@src/clients/stormGlass";
+import { Beach, BeachPosition } from "@src/models/beach";
 import {
-  Beach,
-  BeachPosition,
   Forecast,
   ForecastProcessingInternalError,
 } from "@src/services/forecast";
@@ -22,13 +21,13 @@ describe("Forecast Service", () => {
         lng: 151.289824,
         name: "Manly",
         position: BeachPosition.E,
-        user: "some-id",
+        // user: "some-id",
       },
     ];
 
     const expectedResponse = [
       {
-        time: "2020-04-26T00:00:00+00:00",
+        time: "2020-11-16T00:00:00+00:00",
         forecast: [
           {
             lat: -33.792726,
@@ -39,7 +38,7 @@ describe("Forecast Service", () => {
             swellDirection: 64.26,
             swellHeight: 0.15,
             swellPeriod: 3.89,
-            time: "2020-04-26T00:00:00+00:00",
+            time: "2020-11-16T00:00:00+00:00",
             waveDirection: 231.38,
             waveHeight: 0.47,
             windDirection: 299.45,
@@ -48,7 +47,7 @@ describe("Forecast Service", () => {
         ],
       },
       {
-        time: "2020-04-26T01:00:00+00:00",
+        time: "2020-11-16T01:00:00+00:00",
         forecast: [
           {
             lat: -33.792726,
@@ -59,7 +58,7 @@ describe("Forecast Service", () => {
             swellDirection: 123.41,
             swellHeight: 0.21,
             swellPeriod: 3.67,
-            time: "2020-04-26T01:00:00+00:00",
+            time: "2020-11-16T01:00:00+00:00",
             waveDirection: 232.12,
             waveHeight: 0.46,
             windDirection: 310.48,
@@ -68,7 +67,7 @@ describe("Forecast Service", () => {
         ],
       },
       {
-        time: "2020-04-26T02:00:00+00:00",
+        time: "2020-11-16T02:00:00+00:00",
         forecast: [
           {
             lat: -33.792726,
@@ -79,7 +78,7 @@ describe("Forecast Service", () => {
             swellDirection: 182.56,
             swellHeight: 0.28,
             swellPeriod: 3.44,
-            time: "2020-04-26T02:00:00+00:00",
+            time: "2020-11-16T02:00:00+00:00",
             waveDirection: 232.86,
             waveHeight: 0.46,
             windDirection: 321.5,
@@ -105,7 +104,7 @@ describe("Forecast Service", () => {
         lng: 151.289824,
         name: "Manly",
         position: BeachPosition.E,
-        user: "some-id",
+        // user: "some-id",
       },
     ];
 

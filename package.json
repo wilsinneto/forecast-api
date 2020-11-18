@@ -5,12 +5,12 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "npm run build && node dist/src/index.js",
+    "start": "yarn build && node dist/src/index.js",
     "start:dev": "tsnd src/index.ts",
     "lint": "eslint ./src ./test --ext .ts",
     "lint:fix": "eslint ./src ./test --ext .ts --fix",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "test:unit": "jest --watch",
+    "test": "yarn test:unit && yarn test:functional",
+    "test:unit": "jest",
     "test:functional": "jest --projects ./test --runInBand"
   },
   "keywords": [
@@ -26,6 +26,7 @@
     "@types/jest": "^26.0.15",
     "@types/module-alias": "^2.0.0",
     "@types/mongoose": "^5.7.37",
+    "@types/nock": "^11.1.0",
     "@types/node": "^14.14.2",
     "@types/supertest": "^2.0.10",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
@@ -39,6 +40,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.2",
     "jest": "^26.6.1",
+    "nock": "^13.0.5",
     "prettier": "^2.1.2",
     "supertest": "^5.0.0",
     "ts-jest": "^26.4.2",

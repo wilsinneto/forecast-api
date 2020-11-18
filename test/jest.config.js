@@ -10,7 +10,7 @@ module.exports = {
     rootDir: root,
     displayName: {
       name: "end2end-tests",
-      color: "green",
+      color: "white",
     },
     setupFilesAfterEnv: ["<rootDir>/test/jest-setup.ts"],
     testMatch: ["<rootDir>/test/**/*.test.ts"],
